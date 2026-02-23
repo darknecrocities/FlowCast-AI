@@ -1,0 +1,15 @@
+# Large Media
+sample3.mp4
+*.pt
+
+# Python Caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+venv/
+.env
+
+# OS Files
+.DS_Store

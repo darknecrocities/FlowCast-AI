@@ -1,0 +1,27 @@
+# FlowCast AI System Configuration
+
+system:
+  device: "auto"        # "cuda", "mps", "cpu", or "auto"
+  log_level: "INFO"
+  
+vision:
+  model_id: "yolov8n.pt" # "yolov8n.pt", "yolov8s.pt", etc.
+  confidence: 0.4        # Detection confidence threshold
+  classes: [0, 2, 3, 5, 6, 7]  # COCO indices: person(0), car(2), motorcycle(3), bus(5), train(6), truck(7)
+  
+tracking:
+  buffer_frames: 30      # Max frames a missing track is kept alive
+  frame_rate: 30         # Assumed target FPS
+  
+graph:
+  zone_grid_size: 25     # NxN grid overlaying the frame for zone partitioning
+  heatmap_decay: 0.9     # Decay factor for historical spatial density (exponential moving average)
+
+forecasting:
+  horizon_minutes: 30    # How far ahead the ST-GNN predicts (in simulated minutes)
+  time_step_seconds: 10  # Graph aggregation interval in seconds
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+  websocket_path: "/ws/stream"
