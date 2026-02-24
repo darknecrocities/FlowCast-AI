@@ -1,128 +1,247 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FlowCast AI: Predictive Mobility Intelligence</title>
+    <title>FlowCast AI | Predictive Mobility Intelligence</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
     <style>
-        body { background-color: #0f172a; color: #f8fafc; font-family: 'Inter', sans-serif; }
-        .glass-panel {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
+        :root {
+            --bg-dark: #020617;
+            --accent-blue: #38bdf8;
+            --accent-emerald: #10b981;
+            --accent-red: #ef4444;
+            --glass: rgba(15, 23, 42, 0.8);
         }
+
+        body {
+            background: var(--bg-dark);
+            color: #f8fafc;
+            font-family: 'Outfit', sans-serif;
+            overflow: hidden;
+        }
+
+        .cyber-grid {
+            background-image:
+                linear-gradient(rgba(56, 189, 248, 0.05) 1px, transparent 1px),
+                linear-gradient(90px, rgba(56, 189, 248, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+        }
+
+        .glass-panel {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+        }
+
         .live-stream {
             width: 100%;
             height: auto;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glow-text {
+            text-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
         }
     </style>
 </head>
-<body class="p-6 h-screen flex flex-col">
+
+<body class="p-6 h-screen flex flex-col relative">
+    <div class="cyber-grid"></div>
+
     <!-- Header -->
-    <header class="flex justify-between items-center mb-6">
+    <header class="flex justify-between items-center mb-8">
         <div>
-            <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400">
-                FlowCast AI
-            </h1>
-            <p class="text-slate-400 text-sm">Predictive Mobility Intelligence</p>
+            <div class="flex items-center space-x-3">
+                <div
+                    class="w-10 h-10 bg-gradient-to-br from-blue-500 to-emerald-500 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1
+                        class="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-sky-400 to-emerald-400 glow-text">
+                        FLOWCAST AI
+                    </h1>
+                    <p class="text-slate-500 text-xs font-medium tracking-widest uppercase">Global Predictive
+                        Intelligence</p>
+                </div>
+            </div>
         </div>
-        <div class="flex items-center space-x-4">
-            <span id="connection-status" class="flex items-center text-sm text-yellow-400">
-                <span class="w-2 h-2 rounded-full bg-yellow-400 mr-2 animate-pulse"></span> Connecting...
-            </span>
-            <button onclick="exportData()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-md text-sm font-medium transition-colors border border-blue-400">
-                Export Data (CSV)
+        <div class="flex items-center space-x-6">
+            <div id="connection-status"
+                class="px-4 py-1.5 rounded-full border border-yellow-500/20 bg-yellow-500/10 text-xs font-semibold text-yellow-500 flex items-center">
+                <span class="w-2 h-2 rounded-full bg-yellow-500 mr-2 animate-pulse"></span> SYSTEM: INITIALIZING
+            </div>
+            <button onclick="exportData()"
+                class="group relative px-6 py-2 bg-slate-800 hover:bg-slate-700 rounded-full text-sm font-semibold transition-all border border-slate-700 overflow-hidden">
+                <span class="relative z-10 flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    EXPORT METRICS
+                </span>
             </button>
         </div>
     </header>
 
     <!-- Main Content Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-grow">
-        
-        <!-- Left Column: Video Feed & Slider -->
-        <div class="lg:col-span-2 flex flex-col space-y-4">
-            <div class="glass-panel p-4 flex-grow flex flex-col relative">
-                <h2 class="text-lg font-semibold mb-3 flex items-center">
-                    <svg class="w-5 h-5 mr-2 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                    Live Forecast Feed
-                </h2>
-                <div class="relative w-full bg-black rounded-lg overflow-hidden flex-grow flex items-center justify-center border border-slate-700">
-                    <img id="video-stream" class="live-stream object-contain max-h-[600px]" alt="Waiting for stream..." />
-                    
-                    <!-- Overlay loading state -->
-                    <div id="loading-overlay" class="absolute inset-0 flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm z-10 transition-opacity">
-                        <svg class="animate-spin h-10 w-10 text-emerald-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        <span class="text-slate-300 font-medium">Waiting for inference engine...</span>
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 flex-grow overflow-hidden">
+
+        <!-- Left: Visualization Feed -->
+        <div class="lg:col-span-3 flex flex-col space-y-4 h-full overflow-hidden">
+            <div class="glass-panel p-2 flex-grow flex flex-col relative overflow-hidden group">
+                <div
+                    class="absolute top-6 left-6 z-10 px-3 py-1 bg-black/60 backdrop-blur-md rounded-md border border-white/10 text-[10px] font-bold tracking-tighter text-emerald-400 flex items-center">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2 shadow-sm animate-pulse"></span>
+                    LIVE_INFERENCE_STREAM
+                </div>
+
+                <div
+                    class="relative w-full bg-slate-950 rounded-xl overflow-hidden flex-grow flex items-center justify-center border border-white/5">
+                    <img id="video-stream" class="live-stream object-contain max-h-full transition-all duration-700"
+                        alt="Waiting for stream..." />
+
+                    <div id="loading-overlay"
+                        class="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/80 backdrop-blur-xl z-20">
+                        <div class="relative">
+                            <div
+                                class="w-20 h-20 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin">
+                            </div>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <svg class="w-8 h-8 text-emerald-500 animate-pulse" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                                    </path>
+                                </svg>
+                            </div>
+                        </div>
+                        <span
+                            class="mt-6 text-slate-400 font-medium tracking-widest text-xs uppercase animate-pulse">Synchronizing
+                            Vision Pipeline...</span>
                     </div>
                 </div>
             </div>
-            
-            <div class="glass-panel p-4">
-                <div class="flex justify-between text-sm text-slate-400 mb-2">
-                    <span>Live Prediction Horizon</span>
-                    <span id="horizon-label" class="text-emerald-400 font-mono">+10 mins</span>
+
+            <!-- Controls Overlay -->
+            <div class="glass-panel p-4 flex items-center space-x-6">
+                <div class="flex-grow">
+                    <div
+                        class="flex justify-between text-[10px] font-bold text-slate-500 mb-2 uppercase tracking-widest">
+                        <span>Prediction Horizon</span>
+                        <span id="horizon-label" class="text-blue-400 font-mono">+10 mins</span>
+                    </div>
+                    <input type="range" min="0" max="60" value="10"
+                        class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                        id="horizon-slider">
                 </div>
-                <input type="range" min="0" max="30" value="10" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500" id="horizon-slider">
-                <div class="flex justify-between text-xs text-slate-500 mt-2">
-                    <span>Now</span>
-                    <span>+15m</span>
-                    <span>+30m</span>
+                <div class="flex items-center space-x-2">
+                    <button
+                        class="w-8 h-8 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center hover:bg-slate-700 transition-colors">
+                        <svg class="w-4 h-4 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z">
+                            </path>
+                        </svg>
+                    </button>
+                    <button
+                        class="w-8 h-8 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center hover:bg-slate-700 transition-colors">
+                        <svg class="w-4 h-4 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z">
+                            </path>
+                        </svg>
+                    </button>
                 </div>
             </div>
         </div>
 
-        <!-- Right Column: Analytics & Metrics -->
-        <div class="space-y-6 flex flex-col">
-            
-            <!-- Quick Stats -->
+        <!-- Right: Analytics Stack -->
+        <div class="space-y-6 flex flex-col h-full overflow-hidden">
+
+            <!-- Core Metrics -->
             <div class="grid grid-cols-2 gap-4">
-                <div class="glass-panel p-4 flex flex-col items-center justify-center">
-                    <span class="text-slate-400 text-sm mb-1">Active Objects</span>
-                    <span id="stat-objects" class="text-3xl font-bold text-white font-mono">0</span>
+                <div class="glass-panel p-4 border-l-4 border-l-blue-500">
+                    <div class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Active Tracks</div>
+                    <div id="stat-objects" class="text-4xl font-bold font-mono text-white leading-none">00</div>
                 </div>
-                <div class="glass-panel p-4 flex flex-col items-center justify-center">
-                    <span class="text-slate-400 text-sm mb-1">Pipeline FPS</span>
-                    <span id="stat-fps" class="text-3xl font-bold text-emerald-400 font-mono">0.0</span>
+                <div class="glass-panel p-4 border-l-4 border-l-emerald-500">
+                    <div class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Pipeline FPS</div>
+                    <div id="stat-fps" class="text-4xl font-bold font-mono text-emerald-400 leading-none">0.0</div>
                 </div>
-            </div>
-            
-            <div class="glass-panel p-4 flex flex-col justify-center items-center">
-                <div class="text-slate-400 text-sm w-full text-center mb-2">Max Risk Pressure</div>
-                <div class="relative w-full h-4 bg-slate-700 rounded-full overflow-hidden">
-                    <div id="risk-bar" class="absolute top-0 left-0 h-full bg-gradient-to-r from-green-500 via-yellow-500 to-red-600 transition-all duration-300" style="width: 0%"></div>
-                </div>
-                <span id="stat-risk" class="text-lg font-bold text-white mt-2 font-mono">0.0</span>
             </div>
 
-            <!-- Charts -->
-            <div class="glass-panel p-4 flex-grow">
-                <h3 class="text-sm font-semibold text-slate-300 mb-4">Historical Density vs Pressure</h3>
-                <div class="h-64 w-full relative">
+            <!-- Risk Meter -->
+            <div class="glass-panel p-5">
+                <div class="flex justify-between items-end mb-3">
+                    <div class="text-slate-500 text-[10px] font-bold uppercase tracking-widest">Global Risk Index</div>
+                    <div id="stat-risk" class="text-2xl font-bold font-mono text-white">0.0</div>
+                </div>
+                <div class="h-2 w-full bg-slate-800 rounded-full overflow-hidden flex">
+                    <div id="risk-bar"
+                        class="h-full bg-gradient-to-r from-emerald-500 via-yellow-500 to-red-600 transition-all duration-500 shadow-[0_0_15px_rgba(239,68,68,0.4)]"
+                        style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Real-time Chart -->
+            <div class="glass-panel p-4 flex-grow relative overflow-hidden">
+                <div class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-4">Telemetric Analysis
+                </div>
+                <div class="h-48 w-full">
                     <canvas id="metricsChart"></canvas>
                 </div>
             </div>
-            
-            <!-- System Log -->
-            <div class="glass-panel p-4 h-48 flex flex-col">
-                <h3 class="text-sm font-semibold text-slate-300 mb-2">System Log</h3>
-                <div id="log-container" class="flex-grow overflow-y-auto font-mono text-xs text-slate-400 space-y-1 bg-black/30 p-2 rounded border border-slate-700">
-                    <div>[System] FlowCast UI Initialized.</div>
+
+            <!-- System Log (Cyber Style) -->
+            <div class="glass-panel p-4 h-64 flex flex-col border-t-4 border-t-slate-700">
+                <div class="flex justify-between items-center mb-3">
+                    <div class="text-slate-500 text-[10px] font-bold uppercase tracking-widest">Live Engine Logs</div>
+                    <div class="text-[8px] font-bold text-slate-600 font-mono uppercase">Buffer: 128KB</div>
+                </div>
+                <div id="log-container"
+                    class="flex-grow overflow-y-auto font-mono text-[10px] leading-relaxed text-slate-400 space-y-1 bg-black/40 p-3 rounded-lg border border-white/5">
+                    <div class="text-emerald-500/80 underline tracking-tighter">[System] KERNEL_LOAD: FlowCast Engine
+                        v2.0</div>
                 </div>
             </div>
-            
         </div>
     </div>
 
+    <!-- Background Decoration -->
+    <div class="absolute -bottom-20 -left-20 w-80 h-80 bg-blue-600/10 rounded-full blur-[120px]"></div>
+    <div class="absolute top-40 -right-20 w-80 h-80 bg-emerald-600/10 rounded-full blur-[120px]"></div>
+
     <script>
-        // DOM Elements
         const videoStream = document.getElementById('video-stream');
         const loadingOverlay = document.getElementById('loading-overlay');
         const statusInd = document.getElementById('connection-status');
@@ -134,10 +253,9 @@
         const horizonSlider = document.getElementById('horizon-slider');
         const horizonLabel = document.getElementById('horizon-label');
 
-        // Historical Data for Export
         const historyData = [];
 
-        // Chart.js Setup
+        // Chart Configuration
         const ctx = document.getElementById('metricsChart').getContext('2d');
         const metricsChart = new Chart(ctx, {
             type: 'line',
@@ -145,20 +263,12 @@
                 labels: [],
                 datasets: [
                     {
-                        label: 'Active Objects',
-                        borderColor: '#3b82f6', // blue-500
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        label: 'Tracks',
+                        borderColor: '#38bdf8',
+                        backgroundColor: 'rgba(56, 189, 248, 0.1)',
                         data: [],
                         borderWidth: 2,
-                        tension: 0.4,
-                        fill: true
-                    },
-                    {
-                        label: 'Max Pressure',
-                        borderColor: '#ef4444', // red-500
-                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                        data: [],
-                        borderWidth: 2,
+                        pointRadius: 0,
                         tension: 0.4,
                         fill: true
                     }
@@ -167,136 +277,101 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                animation: false,
                 scales: {
                     x: { display: false },
-                    y: { 
+                    y: {
                         display: true,
-                        grid: { color: 'rgba(255,255,255,0.05)' },
-                        ticks: { color: '#94a3b8' }
+                        grid: { color: 'rgba(255,255,255,0.03)', borderDash: [5, 5] },
+                        ticks: { color: '#475569', font: { size: 8 } }
                     }
                 },
                 plugins: {
-                    legend: {
-                        labels: { color: '#e2e8f0', boxWidth: 12 }
-                    }
+                    legend: { display: false }
                 }
             }
         });
 
-        // Logging utility
-        function addLog(msg) {
-            const time = new Date().toLocaleTimeString();
+        function addLog(msg, type = 'sys') {
+            const time = new Date().toLocaleTimeString('en-US', { hour12: false, fractionalSecondDigits: 2 });
             const el = document.createElement('div');
-            el.innerHTML = `<span class="text-slate-500">[${time}]</span> ${msg}`;
-            logContainer.appendChild(el);
-            logContainer.scrollTop = logContainer.scrollHeight;
+            let colorClass = 'text-slate-500';
+            if (type === 'warn') colorClass = 'text-red-400 font-bold';
+            if (type === 'risk') colorClass = 'text-yellow-400';
+
+            el.innerHTML = `<span class="opacity-50 text-[8px] mr-2">${time}</span><span class="${colorClass}">${msg}</span>`;
+            logContainer.prepend(el);
+            if (logContainer.children.length > 50) logContainer.removeChild(logContainer.lastChild);
         }
 
-        // WebSocket Connection
         let ws;
         function connect() {
-            addLog("Attempting WebSocket connection...");
             ws = new WebSocket(`ws://${window.location.host}/ws/stream`);
-            
+
             ws.onopen = () => {
-                statusInd.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500 mr-2 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span> Connected';
-                statusInd.className = "flex items-center text-sm text-emerald-400";
-                addLog('<span class="text-emerald-400">WebSocket Connected to Engine</span>');
+                statusInd.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500 mr-2 shadow-[0_0_10px_rgba(16,185,129,1)]"></span> STREAM: ACTIVE';
+                statusInd.className = "px-4 py-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 text-xs font-semibold text-emerald-500 flex items-center";
+                addLog('Vision Pipeline Linked Successfully', 'sys');
                 loadingOverlay.style.opacity = '0';
-                setTimeout(() => loadingOverlay.style.display = 'none', 300);
+                setTimeout(() => loadingOverlay.style.display = 'none', 500);
             };
-            
+
             ws.onmessage = (event) => {
                 const data = JSON.parse(event.data);
-                
-                // Update Image
-                if (data.image) {
-                    videoStream.src = data.image;
-                }
-                
-                // Update Analytics
+                if (data.image) videoStream.src = data.image;
+
                 if (data.analytics) {
                     const { fps, active_objects, max_pressure } = data.analytics;
-                    
                     statFps.innerText = fps.toFixed(1);
-                    statObjects.innerText = active_objects;
-                    statRisk.innerText = max_pressure.toFixed(1);
-                    
-                    // Cap risk bar visual at 50 for max pressure representation
-                    const riskPercent = Math.min(100, (max_pressure / 50) * 100);
+                    statObjects.innerText = active_objects.toString().padStart(2, '0');
+                    statRisk.innerText = max_pressure.toFixed(2);
+
+                    const riskPercent = Math.min(100, (max_pressure / 40) * 100);
                     riskBar.style.width = `${riskPercent}%`;
-                    
-                    // Update Chart
-                    const timeLabel = new Date().toLocaleTimeString();
-                    
+
+                    // Smart Logging
+                    if (max_pressure > 25) addLog(`HIGH_PRESSURE_DETECTED: ${max_pressure.toFixed(2)}`, 'risk');
+
+                    const timeLabel = new Date().getTime();
                     if (metricsChart.data.labels.length > 50) {
                         metricsChart.data.labels.shift();
                         metricsChart.data.datasets[0].data.shift();
-                        metricsChart.data.datasets[1].data.shift();
                     }
-                    
                     metricsChart.data.labels.push(timeLabel);
                     metricsChart.data.datasets[0].data.push(active_objects);
-                    metricsChart.data.datasets[1].data.push(max_pressure);
-                    metricsChart.update();
-                    
-                    // Save to history for export
-                    historyData.push({
-                        timestamp: new Date().toISOString(),
-                        fps: fps,
-                        objects: active_objects,
-                        pressure: max_pressure
-                    });
+                    metricsChart.update('none');
+
+                    historyData.push({ timestamp: new Date().toISOString(), fps, objects: active_objects, pressure: max_pressure });
                 }
             };
-            
+
             ws.onclose = () => {
-                statusInd.innerHTML = '<span class="w-2 h-2 rounded-full bg-red-500 mr-2"></span> Disconnected';
-                statusInd.className = "flex items-center text-sm text-red-500";
-                addLog('<span class="text-red-400">WebSocket Disconnected. Reconnecting in 3s...</span>');
+                statusInd.innerHTML = '<span class="w-2 h-2 rounded-full bg-red-500 mr-2 shadow-[0_0_10px_rgba(239,68,68,1)]"></span> STREAM: OFFLINE';
+                statusInd.className = "px-4 py-1.5 rounded-full border border-red-500/20 bg-red-500/10 text-xs font-semibold text-red-500 flex items-center";
+                addLog('Connection Severed. Re-attempting...', 'warn');
                 loadingOverlay.style.display = 'flex';
                 loadingOverlay.style.opacity = '1';
                 setTimeout(connect, 3000);
             };
         }
 
-        // UI Interactions
         horizonSlider.addEventListener('input', (e) => {
             horizonLabel.innerText = `+${e.target.value} mins`;
         });
-        
-        horizonSlider.addEventListener('change', (e) => {
-            addLog(`Requested Forecast Horizon change to +${e.target.value}m`);
-            // In a full implementation, send this to the API via POST /config
-        });
 
-        // CSV Export functionality
         function exportData() {
-            if (historyData.length === 0) {
-                alert("No data collected yet.");
-                return;
-            }
-            
-            let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "Timestamp,FPS,ActiveObjects,MaxPressure\n";
-            
-            historyData.forEach(row => {
-                csvContent += `${row.timestamp},${row.fps},${row.objects},${row.pressure}\n`;
-            });
-            
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `flowcast_export_${new Date().getTime()}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            addLog("Exported metrics data to CSV.");
+            if (historyData.length === 0) return;
+            let csv = "Timestamp,FPS,Objects,Pressure\n";
+            historyData.forEach(r => csv += `${r.timestamp},${r.fps},${r.objects},${r.pressure}\n`);
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `flowcast_data_${Date.now()}.csv`;
+            a.click();
         }
 
-        // Init
         connect();
     </script>
 </body>
+
 </html>

@@ -8,6 +8,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
+
 # In a real app, this would be imported from the main orchestration loop
 # For this prototype, we'll demonstrate the streaming mechanics
 import time
@@ -43,54 +44,60 @@ async def update_config(config: SystemConfig):
 async def get_analytics():
     return current_analytics
 
+from main import vision_pipeline_stream, load_config
+import threading
+from queue import Queue
+
+# Initialize pipeline resources
+config = load_config()
+source = config.get("vision", {}).get("source", "sample.mp4")
+
+# Thread-safe queue for frame delivery
+frame_queue = Queue(maxsize=10)
+
+def run_pipeline_thread():
+    """Background thread to run the vision pipeline and populate the queue."""
+    for frame, analytics in vision_pipeline_stream(config, source):
+        if frame_queue.full():
+            frame_queue.get() # Drop old frames if client is slow
+        frame_queue.put((frame, analytics))
+
+# Start pipeline thread
+threading.Thread(target=run_pipeline_thread, daemon=True).start()
+
 @app.websocket("/ws/stream")
 async def websocket_stream(websocket: WebSocket):
     """
-    Simulates the vision pipeline output for the dashboard via WebSockets.
-    Sends base64 encoded JPEG frames + JSON analytics.
+    Broadcasts real-time frames and analytics from the vision pipeline.
     """
     await websocket.accept()
+    print("Client connected to stream.")
     
-    # We would normally connect this to the actual `run_vision_pipeline` yielding frames
-    # Here, we generate a synthetic feed to demonstrate the WebSocket architecture
-    
-    cap = cv2.VideoCapture(0) # Fallback to local webcam for demo
-    if not cap.isOpened():
-        print("Camera not found, using blank frames.")
-        
     try:
         while True:
-            ret, frame = cap.read() if cap.isOpened() else (True, np.zeros((480, 640, 3), dtype=np.uint8))
+            # Check for new data from the pipeline thread
+            if not frame_queue.empty():
+                frame, analytics = frame_queue.get()
+                
+                # Update global analytics state
+                global current_analytics
+                current_analytics.update(analytics)
+                
+                # Encode frame to JPEG
+                _, buffer = cv2.imencode('.jpg', frame, [cv2.IMWRITE_JPEG_QUALITY, 70])
+                b64_img = base64.b64encode(buffer).decode('utf-8')
+                
+                payload = {
+                    "image": f"data:image/jpeg;base64,{b64_img}",
+                    "analytics": current_analytics
+                }
+                
+                await websocket.send_text(json.dumps(payload))
             
-            # Simulate processing delay
-            await asyncio.sleep(0.05)
-            
-            # --- Synthetic Overlay for Demo Server ---
-            cv2.putText(frame, "FlowCast AI Live Demo", (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-            
-            # Encode frame to JPEG
-            _, buffer = cv2.imencode('.jpg', frame, [cv2.IMWRITE_JPEG_QUALITY, 70])
-            b64_img = base64.b64encode(buffer).decode('utf-8')
-            
-            # Update mocking analytics
-            global current_analytics
-            current_analytics["fps"] = 20.0 + np.random.randn()
-            current_analytics["active_objects"] = int(5 + np.random.rand() * 10)
-            current_analytics["max_pressure"] = float(15.0 + np.random.randn() * 2)
-            
-            # Payload
-            payload = {
-                "image": f"data:image/jpeg;base64,{b64_img}",
-                "analytics": current_analytics
-            }
-            
-            await websocket.send_text(json.dumps(payload))
+            await asyncio.sleep(0.01) # High frequency polling
             
     except WebSocketDisconnect:
         print("Client disconnected.")
-    finally:
-        if cap.isOpened():
-            cap.release()
 
 if __name__ == "__main__":
     import uvicorn
