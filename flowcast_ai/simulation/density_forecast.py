@@ -15,27 +15,28 @@ class FlowSimulationEngine:
         self.cell_w = self.frame_width // self.grid_size
         self.cell_h = self.frame_height // self.grid_size
 
-    def generate_heatmap(self, node_densities: np.ndarray, max_density: float = 10.0) -> np.ndarray:
+    def generate_heatmap(self, node_densities: np.ndarray, max_density: float = 10.0, target_size: tuple = None) -> np.ndarray:
         """
-        Converts a 1D array of node densities into a 2D color heatmap image
-        that matches the original frame resolution.
+        Converts a 1D array of node densities into a 2D color heatmap image.
+        If target_size is provided, resizes directly to that resolution.
         """
         assert len(node_densities) == self.grid_size * self.grid_size
         
         # Reshape to grid
         grid_density = node_densities.reshape((self.grid_size, self.grid_size))
         
-        # Normalize to 0-255 based on assumed max density per cell
+        # Normalize to 0-255
         normalized = np.clip(grid_density / max_density, 0, 1.0)
         heatmap_gray = (normalized * 255).astype(np.uint8)
         
-        # Resize to frame dimensions using interpolation
-        heatmap_resized = cv2.resize(heatmap_gray, (self.frame_width, self.frame_height), interpolation=cv2.INTER_CUBIC)
+        # Resize to target or frame dimensions
+        out_w, out_h = target_size if target_size else (self.frame_width, self.frame_height)
+        heatmap_resized = cv2.resize(heatmap_gray, (out_w, out_h), interpolation=cv2.INTER_CUBIC)
         
-        # Apply colormap (Color: Blue -> Free, Yellow -> Pressure, Red -> Congestion)
+        # Apply colormap
         heatmap_color = cv2.applyColorMap(heatmap_resized, cv2.COLORMAP_JET)
         
-        # Mask out zero-density regions completely
+        # Mask out zero-density regions
         mask = heatmap_resized > 10
         result = np.zeros_like(heatmap_color)
         result[mask] = heatmap_color[mask]

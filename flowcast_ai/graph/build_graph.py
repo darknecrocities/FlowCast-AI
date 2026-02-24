@@ -100,6 +100,10 @@ class SpatialGraphBuilder:
         x = torch.tensor(self.node_features, dtype=torch.float32)
         return Data(x=x, edge_index=self.edge_index)
 
+    def get_features(self) -> np.ndarray:
+        """ Returns current node features as numpy array [num_nodes, 4]. """
+        return self.node_features.copy()
+
 if __name__ == "__main__":
     builder = SpatialGraphBuilder(1920, 1080, 5, 0.9)
     print(f"Num Nodes: {builder.num_nodes}")

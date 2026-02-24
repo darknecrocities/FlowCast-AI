@@ -12,17 +12,22 @@
 
 ### 🚀 Ultra-Performance Pipeline
 - **MPS Hardware Acceleration**: Optimized for Apple Silicon using Metal Performance Shaders.
-- **In-Loop Processing**: Achieves **1000+ FPS** throughput on high-resolution streams like `sample2.mp4`.
-- **Zero-Lag Visualization**: Efficient OpenCV drawing routines for complex geometric overlays.
+- **Optimized Rendering**: Consolidated Heatmap and Trail drawing for **~1000+ FPS** throughput.
+- **Zero-Lag Visualization**: Efficient OpenCV routines for complex geometric overlays and high-density streams.
 
-### 👥 Collective Visualization
-- **Group Bounding Boxes**: Master boxes that automatically wrap around clusters of people or vehicles.
-- **Social Flow Mesh**: Dynamic connection lines that visualize interactions between similar objects.
-- **Distance-Aware Analytics**: Live distance labels (in pixels) showing real-time proximity within groups.
+### �️ Collision Intelligence & Safety
+- **Universal Proximity Mapping**: Live distance labels between **all** object types.
+- **Collision Alerts**: Connection lines turn **Vibrant Red** with "COLLISION WARNING" tags for dangerous proximity (< 120px).
+- **Object Grounding**: Dynamic base ellipses for professional, AR-style object tracking.
 
-### 🛡️ Intelligent Categorization
-- **Unified Grouping**: Simplifies complex scenes into core categories: **Person** and **Vehicle** (Trains, Cars, Buses, etc.).
-- **Persistent Tracking**: Ensures objects maintain their identity and classification throughout the entire trajectory.
+### 🌍 Universal Object Intelligence
+- **Full COCO Detection**: Detects all 80 categories (Stoplights, Signs, Hydrants, etc.).
+- **Categorical HUD**: Counts for **PEOPLE**, **VEHICLES**, and **INFRASTRUCTURE**.
+- **Real-Time Metrics**: Confidence scores (%) and speed (px/s) indicators for every object.
+
+### 📊 Spatial Density Analysis
+- **Occupancy Heatmap**: Subtle green grid overlay visualizing currently occupied zones.
+- **Historical Trails**: Fading trajectories showing the movement path of every tracked object.
 
 ---
 
@@ -32,12 +37,11 @@
 graph TD
     A[Video Stream / RTSP] --> B[YOLOv8 Detection]
     B --> C[ByteTrack Tracking]
-    C --> D[Trajectory Intelligence]
-    D --> E[Spatial Graph Construction]
-    E --> F[ST-GNN Forecasting]
-    F --> G[Flow Simulation Engine]
-    G --> H[Visual Drawing Engine]
-    H --> I[Ultra-Performance HUD]
+    C --> D[Trajectory & Speed Engine]
+    D --> E[Spatial Graph & Heatmap]
+    E --> F[Collision & Proximity Logic]
+    F --> G[Visual Drawing Engine]
+    G --> H[Ultra-Performance HUD]
 ```
 
 ---
@@ -47,7 +51,7 @@ graph TD
 - **Vision**: [Ultralytics YOLOv8](https://github.com/ultralytics/ultralytics), ByteTrack.
 - **Core Logic**: Python 3.13+, NumPy, OpenCV.
 - **AI/Graphs**: PyTorch, PyTorch Geometric (ST-GNN).
-- **Optimization**: Apple Metal (MPS).
+- **Optimization**: Apple Metal (MPS), Consolidated Mask Blending.
 
 ---
 
@@ -62,27 +66,19 @@ pip install -r requirements.txt
 
 ### 2. Run Inference
 ```bash
-# Optimized Real-Time Mode
+# Optimized Predictive Mode
 python3 main.py --source sample.mp4
 ```
 
 ---
 
-## 📊 Performance Benchmark
-
-| Video Source | Resolution | Device | Avg. Inference Speed |
-| :--- | :--- | :--- | :--- |
-| `sample.mp4` | 1080p | Mac (M-Series) | ~5000 FPS |
-| `sample2.mp4` | 4K | Mac (M-Series) | ~2000 FPS |
-
----
-
-## 📋 Roadmap
-- [x] Phase 12: Performance Optimization & FPS Fixes
-- [x] Phase 13: Social Flow & Grouping
-- [x] Phase 14: Distance-Aware Proximity
-- [x] Phase 15: Collective Bounding Boxes
-- [ ] Phase 16: Multi-Camera Fusion
+## � Roadmap
+- [x] Phase 15: Universal Object Detection (All COCO Classes)
+- [x] Phase 16: Advanced Metrics (Conf Score & Speed px/s)
+- [x] Phase 17: Collision Intelligence & Dangerous Proximity
+- [x] Phase 18: Spatial Density Heatmap & Occupancy Grid
+- [x] Phase 19: Performance Optimization (Rendering Bottlenecks)
+- [x] Phase 20: Predictive AI (ST-GNN) Production Deployment
 
 ---
 *Developed by Arron Kian Parejas | CS-301*

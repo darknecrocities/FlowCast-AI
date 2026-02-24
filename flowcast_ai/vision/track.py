@@ -23,29 +23,36 @@ def box_iou(boxes1, boxes2):
     return inter / np.clip(union, 1e-6, None)
 
 class Track:
-    def __init__(self, obj_id, bbox, class_id=0):
+    def __init__(self, obj_id, bbox, class_id=0, confidence=0.0):
         self.obj_id = obj_id
         self.bbox = bbox  # [x1, y1, x2, y2]
         self.class_id = class_id
+        self.confidence = confidence
         self.history = [] # Past positions: (timestamp, cx, cy)
         self.velocity = (0.0, 0.0) # (vx, vy)
         self.time_since_update = 0
         self.hits = 1
 
-    def update(self, bbox, timestamp):
-        self.history.append((timestamp, self.get_center()[0], self.get_center()[1]))
-        if len(self.history) > 30: # Max history length for tracking buffer
-            self.history.pop(0)
-            
-        # Calculate velocity based on last seen position
+    def update(self, bbox, confidence, timestamp):
+        # 1. Store previous center for velocity calculation
         prev_cx, prev_cy = self.get_center()
+        prev_ts = self.history[-1][0] if len(self.history) > 0 else None
+        
+        # 2. Update current state
         self.bbox = bbox
+        self.confidence = confidence
         curr_cx, curr_cy = self.get_center()
         
-        # Simple finite difference velocity
-        dt = timestamp - self.history[-1][0] if len(self.history) > 0 else 0
-        if dt > 0:
-            self.velocity = ((curr_cx - prev_cx) / dt, (curr_cy - prev_cy) / dt)
+        # 3. Append to history
+        self.history.append((timestamp, curr_cx, curr_cy))
+        if len(self.history) > 30:
+            self.history.pop(0)
+            
+        # 4. Calculate velocity: (pixels change) / (time change)
+        if prev_ts is not None:
+            dt = timestamp - prev_ts
+            if dt > 0:
+                self.velocity = ((curr_cx - prev_cx) / dt, (curr_cy - prev_cy) / dt)
             
         self.time_since_update = 0
         self.hits += 1
@@ -106,7 +113,7 @@ class ByteTracker:
             for r, c in zip(row_ind, col_ind):
                 if cost_matrix[r, c] > self.match_thresh:
                     continue
-                self.tracks[r].update(high_dets[c], timestamp)
+                self.tracks[r].update(high_dets[c], scores[high_idx][c], timestamp)
                 unmatched_tracks.remove(r)
                 unmatched_high_dets.remove(c)
 
@@ -125,12 +132,12 @@ class ByteTracker:
                     matches_low.append((unmatched_tracks[r], c))
 
             for track_idx, c in matches_low:
-                self.tracks[track_idx].update(low_dets[c], timestamp)
+                self.tracks[track_idx].update(low_dets[c], scores[low_idx][c], timestamp)
                 unmatched_tracks.remove(track_idx)
 
         # Step 3: Instantiate new tracks for unmatched high-score detections
         for c in unmatched_high_dets:
-            new_track = Track(self.next_id, high_dets[c], high_classes[c])
+            new_track = Track(self.next_id, high_dets[c], high_classes[c], scores[high_idx][c])
             new_track.history.append((timestamp, new_track.get_center()[0], new_track.get_center()[1]))
             self.tracks.append(new_track)
             self.next_id += 1
@@ -153,7 +160,8 @@ class ByteTracker:
                     "y_center": cy,
                     "velocity": t.velocity,
                     "timestamp": timestamp,
-                    "bbox": t.bbox # Kept for drawing
+                    "bbox": t.bbox, # Kept for drawing
+                    "confidence": t.confidence
                 })
                 
         return output

@@ -7,7 +7,7 @@ system:
 vision:
   model_id: "yolov8n.pt" # "yolov8n.pt", "yolov8s.pt", etc.
   confidence: 0.4        # Detection confidence threshold
-  classes: [0, 2, 3, 5, 6, 7]  # COCO indices: person(0), car(2), motorcycle(3), bus(5), train(6), truck(7)
+  classes: null  # COCO indices: person(0), car(2), motorcycle(3), bus(5), train(6), truck(7), etc. (null for all)
   
 tracking:
   buffer_frames: 30      # Max frames a missing track is kept alive
